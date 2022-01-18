@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Expenses List</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+</head>
+
+<script type="text/javascript">
+	function getAllExpenseInfo() {
+		jQuery
+				.ajax({
+					type : 'GET',
+					cache : true,
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : location.origin + "/all",
+					success : function(data) {
+						$('#expenseTBLid')
+								.html(
+										'<table class="table  table-bordered "  id="allPat" ></table>');
+						dataTable = $('#allPat')
+								.dataTable(
+										{
+											"data" : data,
+											"bLengthChange" : false,
+											"bFilter" : true,
+											"bInfo" : false,
+											"scrollCollapse" : true,
+											"paging" : false,
+											'iDisplayLength' : 2,
+											"dom" : 'lrtip',
+											"aoColumns" : [ {
+												"mDataProp" : "name",
+												"title" : "Name of the Expenditure",
+												"width" : "30%"
+											}, {
+												"mDataProp" : "expenditure",
+												"title" : "Expenditure",
+												"width" : "25%"
+											},
+
+											{
+												"mDataProp" : "datee",
+												"title" : "Date",
+												"width" : "25%"
+											}, 
+											{
+												"mDataProp" : "",
+												"title" : "Deletion",
+												"width" : "10%"
+											},
+
+											{
+												"mDataProp" : "",
+												"title" : "Updation",
+												"sWidth" : "10%"
+											} ],
+											"columnDefs" : [
+													{
+														"sClass" : "editTblAction",
+														"sWidth" : "20px",
+														"targets" : -1,
+														"data" : null,
+														"title" : "Edit",
+														"bSortable" : false,
+														render : function(data,
+																type, row) {
+															return '<a class="btn btn-primary" href="#" onclick="addOrEditData('
+																	+ row.expenseId
+																	+ ')">Edit</a>';
+														}
+
+													},
+													{
+														"targets" : -2,
+														"sClass" : "editTblAction",
+														"data" : null,
+														"title" : "ReSendOTP",
+														"bSortable" : false,
+														"sWidth" : "20px",
+														render : function(data,
+																type, row) {
+															return '<a class="btn btn-danger" href="#" onclick="deleteData('
+																	+ row.expenseId
+																	+ ')">Delete</a>';
+														}
+													} ]
+										});
+
+					}
+				
+				});
+		$("#searchId").keyup(function() {
+			dataTable.fnFilter(this.value);
+			$("#allPat_filter").hide();
+		});
+
+	}
+
+	function deleteData(expenseId) {
+		$("#id01").modal();
+		$("#hiddenId").val(expenseId);
+	}
+
+	function editData(expenseId) {
+		$("#editInformation").modal();
+		$("#hiddenId").val(expenseId);
+	}
+
+	function deleteExpenseData() {
+		jQuery.ajax({
+			type : 'DELETE',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/expense/" + $("#hiddenId").val(),
+			success : function(data) {
+				debugger;
+				$("#id01").modal('hide');
+				window.location.assign(location.origin +window.location.pathname)
+			},
+			error : function(data) {
+				$("#id01").modal('hide');
+				window.location.assign(location.origin+window.location.pathname );
+			}
+		});
+	}
+
+	function addOrEditData(expenseId) {
+		$("#editInformation").modal();
+
+		jQuery.ajax({
+			type : 'GET',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/expense/" + expenseId,
+			success : function(data) {
+				//$("#nameexp").val(data.name);
+				$("#datee").val(data.datee);
+				$("#expenditure").val(data.expenditure);
+				$("#hiddenId").val(expenseId);
+			}
+		});
+	}
+
+	function updateExpense() {
+		var inputPayload = {
+			//"name" : $("#nameexp").val(),
+			"datee" : $("#datee").val(),
+			"expenditure" : $("#expenditure").val()
+		}
+		var inputPayloadString = JSON.stringify(inputPayload);
+		jQuery.ajax({
+			type : 'POST',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/expense/" + $("#hiddenId").val(),
+			data : inputPayloadString,
+			success : function(data) {
+				$("#editInformation").modal('hide');
+				//window.location.assign(location.origin)
+				window.location.assign(location.origin +window.location.pathname)
+			},
+			error : function(data) {
+				$("#editInformation").modal('hide');
+				window.location.assign(location.origin);
+			}
+		});
+
+	}
+</script>
+
+
+
+
+<body onload="getAllExpenseInfo()">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="collapse navbar-collapse" id="navbarColor01">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href="/index_main">Home
+				</a></li>
+				<li class="nav-item"><a class="nav-link" href="/addExpense">Add
+						Expense</a></li>
+
+			</ul>
+			<form class="form-inline">
+				<input class="form-control mr-sm-2" type="search"
+					placeholder="Search" aria-label="Search" id="searchId">
+
+			</form>
+		</div>
+	</nav>
+
+	<br />
+	<div class="container">
+		<h3>Your Expenses</h3>
+		<input type="hidden" id="hiddenId" />
+		<div id="expenseTBLid"></div>
+	</div>
+
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="editInformation" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content" style="color: black">
+				<div class="modal-header">
+					<h4 class="modal-title">Edit Your Expenses</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+
+					 	<div class="row">
+							<div class="col-sm-7">
+							  	<div class="form-group">
+									<label>Date</label> <input type="date" class="form-control"
+										id="datee">
+								</div> 
+							</div>
+						<!-- <div class="col-sm-5">
+								<div class="form-group">
+									<label>Date</label> <input type="text" class="form-control"
+										id="datee">
+								</div>
+							</div>  -->
+						</div>
+						<div class="row">
+							<div class="col-sm-7">
+								<div class="form-group">
+									<label>Expenditure(Amount Spent)</label> <input type="text" class="form-control"
+										id="expenditure">
+								</div>
+							</div>
+
+						</div>
+
+
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-warning"
+						onclick="updateExpense()">Update</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="id01" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content" style="color: black">
+				<div class="modal-header">
+
+					<h4 class="modal-title">Delete Information</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<i>Are you really Sure. You want to Continue..</i>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal"
+						onclick="deleteExpenseData()">Delete</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+<div>
+Hello
+</div>
+</body>
+</html>

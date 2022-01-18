@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Expenses List</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- <link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"> -->
+
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
+<script
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+</head>
+
+<script type="text/javascript">
+	function getAllIncomeInfo() {
+		jQuery
+				.ajax({
+					type : 'GET',
+					cache : true,
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : location.origin + "/allIncomes",
+					success : function(data) {
+						$('#incomeTBLid')
+								.html(
+										'<table class="table  table-bordered "  id="allPat" ></table>');
+						dataTable = $('#allPat')
+								.dataTable(
+										{
+											"data" : data,
+											"bLengthChange" : false,
+											"bFilter" : true,
+											"bInfo" : false,
+											"scrollCollapse" : true,
+											"paging" : false,
+											'iDisplayLength' : 2,
+											"dom" : 'lrtip',
+											"aoColumns" : [ {
+												"mDataProp" : "iname",
+												"title" : "Income Category",
+												"width" : "30%"
+											}, {
+												"mDataProp" : "income",
+												"title" : "Income",
+												"width" : "25%"
+											},
+
+											{
+												"mDataProp" : "datee",
+												"title" : "Date",
+												"width" : "25%"
+											}, 
+											{
+												"mDataProp" : "",
+												"title" : "Deletion",
+												"width" : "10%"
+											},
+
+											{
+												"mDataProp" : "",
+												"title" : "Updation",
+												"sWidth" : "10%"
+											} ],
+											"columnDefs" : [
+													{
+														"sClass" : "editTblAction",
+														"sWidth" : "20px",
+														"targets" : -1,
+														"data" : null,
+														"title" : "Edit",
+														"bSortable" : false,
+														render : function(data,
+																type, row) {
+															return '<a class="btn btn-primary" href="#" onclick="addOrEditData('
+																	+ row.incomeId
+																	+ ')">Edit</a>';
+														}
+
+													},
+													{
+														"targets" : -2,
+														"sClass" : "editTblAction",
+														"data" : null,
+														"title" : "ReSendOTP",
+														"bSortable" : false,
+														"sWidth" : "20px",
+														render : function(data,
+																type, row) {
+															return '<a class="btn btn-danger" href="#" onclick="deleteData('
+																	+ row.incomeId
+																	+ ')">Delete</a>';
+														}
+													} ]
+										});
+
+					}
+				
+				});
+		$("#searchId").keyup(function() {
+			dataTable.fnFilter(this.value);
+			$("#allPat_filter").hide();
+		});
+
+	}
+
+	function deleteData(incomeId) {
+		$("#id01").modal();
+		$("#hiddenId").val(incomeId);
+	}
+
+	function editData(incomeId) {
+		$("#editInformation").modal();
+		$("#hiddenId").val(incomeId);
+	}
+
+	function deleteIncomeData() {
+		jQuery.ajax({
+			type : 'DELETE',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/income/" + $("#hiddenId").val(),
+			success : function(data) {
+				debugger;
+				$("#id01").modal('hide');
+				window.location.assign(location.origin +window.location.pathname)
+			},
+			error : function(data) {
+				$("#id01").modal('hide');
+				window.location.assign(location.origin+window.location.pathname );
+			}
+		});
+	}
+
+	function addOrEditData(incomeId) {
+		$("#editInformation").modal();
+
+		jQuery.ajax({
+			type : 'GET',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/income/" + incomeId,
+			success : function(data) {
+				//$("#nameexp").val(data.name);
+				$("#datee").val(data.datee);
+				$("#expenditure").val(data.income);
+				$("#hiddenId").val(incomeId);
+			}
+		});
+	}
+
+	function updateIncome() {
+		var inputPayload = {
+			//"name" : $("#nameexp").val(),
+			"datee" : $("#datee").val(),
+			"income" : $("#expenditure").val()
+		}
+		var inputPayloadString = JSON.stringify(inputPayload);
+		jQuery.ajax({
+			type : 'POST',
+			cache : true,
+			async : false,
+			contentType : 'application/json',
+			dataType : 'json',
+			url : location.origin + "/income/" + $("#hiddenId").val(),
+			data : inputPayloadString,
+			success : function(data) {
+				$("#editInformation").modal('hide');
+				window.location.assign(location.origin +window.location.pathname)
+			},
+			error : function(data) {
+				$("#editInformation").modal('hide');
+				window.location.assign(location.origin+window.location.pathname);
+			}
+		});
+
+	}
+</script>
+
+
+
+
+<body onload="getAllIncomeInfo()">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="collapse navbar-collapse" id="navbarColor01">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href="/index_main">Home
+				</a></li>
+				<li class="nav-item"><a class="nav-link" href="/addIncome">Add
+						Income</a></li>
+
+			</ul>
+			<form class="form-inline">
+				<input class="form-control mr-sm-2" type="search"
+					placeholder="Search" aria-label="Search" id="searchId">
+
+			</form>
+		</div>
+	</nav>
+
+	<br />
+	<div class="container">
+		<h3>Your Income</h3>
+		<input type="hidden" id="hiddenId" />
+		<div id="incomeTBLid"></div>
+	</div>
+
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="editInformation" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content" style="color: black">
+				<div class="modal-header">
+					<h4 class="modal-title">Edit Your Income</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+
+					 	<div class="row">
+							<div class="col-sm-7">
+							  	<div class="form-group">
+									<label>Date</label> <input type="date" class="form-control"
+										id="datee">
+								</div> 
+							</div>
+						<!-- <div class="col-sm-5">
+								<div class="form-group">
+									<label>Date</label> <input type="text" class="form-control"
+										id="datee">
+								</div>
+							</div>  -->
+						</div>
+						<div class="row">
+							<div class="col-sm-7">
+								<div class="form-group">
+									<label>Income(Amount gained)</label> <input type="text" class="form-control"
+										id="expenditure">
+								</div>
+							</div>
+
+						</div>
+
+
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-warning"
+						onclick="updateIncome()">Update</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="id01" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content" style="color: black">
+				<div class="modal-header">
+
+					<h4 class="modal-title">Delete Information</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<i>Are you really Sure. You want to Continue..</i>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal"
+						onclick="deleteIncomeData()">Delete</button>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>

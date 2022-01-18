@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="ISO-8859-1">
+<title>Employee Management</title>
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+<link rel="stylesheet"
+	href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.rtl.min.css" />
+<!-- Default theme -->
+<link rel="stylesheet"
+	href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.rtl.min.css" />
+<!-- Semantic UI theme -->
+<link rel="stylesheet"
+	href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/semantic.rtl.min.css" />
+<script
+	src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+
+	
+	function validateIncomeInformation() {
+		
+		
+		
+		
+		var isValidated = true;
+		
+		
+		if ($("#datee").val() == '') {
+			$("#dateSpanId").show();
+			isValidated = false;
+		} else {
+			$("#dateSpanId").hide();
+			isValidated = true;
+		}
+		if ($("#expenditure").val() == '') {
+			$("#expenditureSpanId").show();
+			isValidated = false;
+		} else {
+			$("#expenditureSpanId").hide();
+			isValidated = true;
+		}
+		
+		return isValidated;
+
+	}
+
+	function saveIncomeInformation() {
+		if (validateIncomeInformation()) {
+			var inputPayload = {
+				
+				"iname" : $("#nameexp").val(),
+				"datee" : $("#datee").val(),
+				"income" : $("#expenditure").val(),
+			}
+			var inputPayloadString = JSON.stringify(inputPayload);
+			jQuery.ajax({
+				type : 'POST',
+				cache : true,
+				async : false,
+				contentType : 'application/json',
+				dataType : 'json',
+				url : location.origin + "/addIncome",
+				data : inputPayloadString,
+				success : function(data) {
+					clearAllFormData();
+					alertify.alert('Confirmation', 'Successfully Created!!',
+							function() {
+							});
+				}
+			});
+
+		}
+	}
+
+	function clearAllFormData() {
+		
+		$("#datee").val("");
+		$("#expenditure").val("");
+	}
+
+	function hideAllErrorMessage() {
+		
+		$("#dateSpanId").hide();
+		$("#expenditureSpanId").hide();
+		
+	}
+</script>
+
+
+
+
+
+
+</head>
+<body onload="hideAllErrorMessage()">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="collapse navbar-collapse" id="navbarColor01">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href="/index_main">Go to Home
+				</a></li>
+			</ul>
+
+		</div>
+	</nav>
+
+	<br />
+	<div class="container">
+		<div class="card">
+			<div class="card-header">
+			  
+				Add Income<span style="float: right"><span
+					style="color: red">*</span> Fields are mandatory</span>
+					<sec:authentication property="principal.username" id="respectiveValue" /> 
+					
+	
+			</div>
+			<div class="card-body">
+				<div class="container-fluid">
+
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="form-group">
+								<!--  <label for="usr">Name of the Expenditure<span style="color: red">*</span></label> <input
+									class="form-control" id="nameexp"> <span
+									class="text-danger" id="nameexpSpanId">Name of the Expenditure is mandatory
+									</span>-->
+									<label for="Income category">Choose an Income Category</label>
+  	<select name="Income"  class="form-control" id="nameexp">
+  
+  	<option value="Banking">Banking</option>
+  	<option value="Banking">Business</option>
+  	<option value="Office">Office</option>
+  	<option value="Gift Voucher">Gift Voucher</option>
+    <option value="Salary">Salary</option>
+    <option value="Others">Others</option>
+  </select>
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="form-group">
+								<label for="usr">Date<span style="color: red">*</span></label> <input
+									type="date" class="form-control" id="datee"> <span
+									class="text-danger" id="dateSpanId">Date of the Income is mandatory</span>
+							</div>
+						</div>
+						
+					</div>
+
+					<div class="row">
+						<div class="col-sm-7">
+							<div class="form-group">
+								<label>Income   [Only numbers]<span style="color: red">*</span></label> <input
+									type="number" class="form-control" pattern= "[0-9]" id="expenditure"> <span
+									class="text-danger" id="expenditureSpanId">Income is
+									mandatory</span>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+
+
+
+
+			</div>
+			<div class="card-footer">
+				<button type="button" class="btn btn-primary" style="float: left"
+					onclick="saveIncomeInformation()">Save my Income</button>
+				<!--  <button type="button" class="btn btn-primary" style="float: right" 
+					onclick="onClickBack()">Back</button> -->
+					<a href="/index_main" class="btn btn-primary" style="float:right" role="button">Back</a>
+			</div>
+		</div>
+
+
+	</div>
+</body>
+</html>

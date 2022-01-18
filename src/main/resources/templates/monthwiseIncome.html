@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Expenses List</title>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+	crossorigin="anonymous">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- <link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"> -->
+
+<!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
+<script
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+</head>
+
+<script type="text/javascript">
+	function getAllIncomeInfo() {
+		
+		jQuery.ajax({
+					type : 'GET',
+					cache : true,
+					async : false,
+					contentType : 'application/json',
+					dataType : 'json',
+					url : location.origin + "/getMonthlyIncome/"+$("#monthId").val(),
+					success : function(data) {
+						$('#incomeTBLid')
+						.html(
+						'<table class="table  table-bordered "  id="allPat" ></table>');
+		dataTable = $('#allPat')
+				.dataTable(
+						{
+							"data" : data,
+							"bLengthChange" : false,
+							"bFilter" : true,
+							"bInfo" : false,
+							//"scrollCollapse" : true,
+							//"paging" : false,
+							//'iDisplayLength' : 2,
+							"dom" : 'lrtip',
+							"aoColumns" : [ {
+								"mDataProp" : "iname",
+								"title" : "Name of the Expenditure",
+								"width" : "40%"
+							}, {
+								"mDataProp" : "income",
+								"title" : "Expenditure",
+								"width" : "30%"
+							},
+
+							{
+								"mDataProp" : "datee",
+								"title" : "Date",
+								"width" : "30%"
+							}, 
+							
+
+							],
+							
+						});
+
+	}
+
+});
+$("#searchId").keyup(function() {
+dataTable.fnFilter(this.value);
+$("#allPat_filter").hide();
+});
+
+}
+
+</script>
+
+
+
+
+<body onload="getAllIncomeInfo()">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="collapse navbar-collapse" id="navbarColor01">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href="/index_main">Home
+				</a></li>
+			</ul>
+			<form class="form-inline">
+				<input class="form-control mr-sm-2" type="search"
+					placeholder="Search" aria-label="Search" id="searchId">
+
+			</form>
+		</div>
+	</nav>
+
+	<br />
+	<div class="container">
+		<h3>Month-wise Income</h3>
+		<br>
+	
+		<div class="form-group">
+				
+	<label for="Expenditure category">Choose the month</label>
+  	<select name="month"  class="form-control" id="monthId" style="width: 250px;">
+  <option selected disabled hidden>Select Month</option>	
+  	<option value=1>January</option>
+  	<option value=2>February</option>
+  	<option value=3>March</option>
+    <option value=4>April</option>
+    <option value=5>May</option>
+    <option value=6>June</option>
+    <option value=7>July</option>
+    <option value=8>August</option>
+    <option value=9>September</option>
+    <option value=10>October</option>
+    <option value=11>November</option>
+    <option value=12>December</option>
+  </select>
+  <br>
+  <button type="button" class="btn btn-primary" style="float: left"
+					onclick="getAllIncomeInfo()">Show my Income</button>
+					
+	</div>
+	<br>
+		<input type="hidden" id="hiddenId" />
+		<div id="expenseTBLid"></div>
+	</div>
+	
+		
+		<div id="incomeTBLid"></div>
+	</div>
+
+
+
+</body>
+</html>
