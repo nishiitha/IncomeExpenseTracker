@@ -2,7 +2,7 @@
 
 This is a FULLSTACK APPLICATION which is implemented using..
 
-1)SpringBoot(Backend)
+1)SpringBoot(Backend) JAVA
 2)MySQL(DataBase)
 3)HTML,CSS,JS,BOOTSTRAP(FRONTEND)
 
